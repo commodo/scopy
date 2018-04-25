@@ -30,8 +30,8 @@ SpectrumMarker::SpectrumMarker(const QString &title, bool movable) :
 {
 }
 
-SpectrumMarker::SpectrumMarker(const QString &title, QwtAxisId xAxis,
-	QwtAxisId yAxis, bool movable) :
+SpectrumMarker::SpectrumMarker(const QString &title, int xAxis,
+	int yAxis, bool movable) :
 	QwtPlotMarker(title), m_xAxis(xAxis), m_yAxis(yAxis), m_movable(movable), m_selected(false)
 {
 }

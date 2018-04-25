@@ -72,7 +72,7 @@ namespace adiscope {
 
 		int getNumSamples() const;
         void setShowZero(bool en);
-        const QwtScaleWidget* getAxisWidget(QwtAxisId id);
+        const QwtScaleWidget* getAxisWidget(int id);
 
 	const QColor& getColor() const;
 	double getThickness();

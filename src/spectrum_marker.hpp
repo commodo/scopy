@@ -28,7 +28,7 @@ class SpectrumMarker: public QwtPlotMarker
 {
 public:
 	SpectrumMarker(const QString& title, bool movable = true);
-	SpectrumMarker(const QString &title, QwtAxisId xAxis, QwtAxisId yAxis,
+	SpectrumMarker(const QString &title, int xAxisId, int yAxisId,
 		bool movable = true);
 	virtual ~SpectrumMarker();
 
@@ -47,8 +47,8 @@ public:
 	QRect boundingRectPixels() const;
 
 private:
-	QwtAxisId m_xAxis;
-	QwtAxisId m_yAxis;
+	int m_xAxis;
+	int m_yAxis;
 	bool m_selected;
 	bool m_movable;
 	QColor m_default_color;

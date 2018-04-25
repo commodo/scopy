@@ -24,8 +24,8 @@
 /*
  * Abstract Class Symbol
  */
-Symbol::Symbol(QObject *parent, const QSize& size, QwtAxisId fixedAxis,
-		QwtAxisId mobileAxis, bool opposedToFixed, bool floats):
+Symbol::Symbol(QObject *parent, const QSize& size, int fixedAxis,
+		int mobileAxis, bool opposedToFixed, bool floats):
 	QObject(parent),
 	d_surface(QRect(QPoint(0, 0), size)),
 	d_anchor(0, 0),
@@ -112,17 +112,17 @@ bool Symbol::isSelected()
 	return d_selected;
 }
 
-QwtAxisId Symbol::fixedAxis() const
+int Symbol::fixedAxis() const
 {
 	return d_fixedAxis;
 }
 
-QwtAxisId Symbol::mobileAxis() const
+int Symbol::mobileAxis() const
 {
 	return d_mobileAxis;
 }
 
-void Symbol::setMobileAxis(QwtAxisId newAxis)
+void Symbol::setMobileAxis(int newAxis)
 {
 	if (d_mobileAxis != newAxis) {
 		const QwtScaleWidget *mAxis = plot()->axisWidget(d_mobileAxis);
@@ -193,10 +193,20 @@ const QPen& Symbol::pen()
 	return d_pen;
 }
 
+bool Symbol::fixedAxisIsX() const
+{
+	return (d_fixedAxis == QwtPlot::xBottom || d_fixedAxis == QwtPlot::xTop);
+}
+
+bool Symbol::fixedAxisIsY() const
+{
+	return (d_fixedAxis == QwtPlot::yLeft || d_fixedAxis == QwtPlot::yRight);
+}
+
 QPointF Symbol::invTransform(const QPointF &point) const
 {
-	QwtAxisId xAxis = d_fixedAxis.isXAxis() ? d_fixedAxis : d_mobileAxis;
-	QwtAxisId yAxis = d_fixedAxis.isYAxis() ? d_fixedAxis : d_mobileAxis;
+	int xAxis = fixedAxisIsX() ? d_fixedAxis : d_mobileAxis;
+	int yAxis = fixedAxisIsY() ? d_fixedAxis : d_mobileAxis;
 	const QwtScaleMap xMap = plot()->canvasMap(xAxis);
 	const QwtScaleMap yMap = plot()->canvasMap(yAxis);
 
@@ -205,8 +215,8 @@ QPointF Symbol::invTransform(const QPointF &point) const
 
 QPointF Symbol::transform(const QPointF &point) const
 {
-	QwtAxisId xAxis = d_fixedAxis.isXAxis() ? d_fixedAxis : d_mobileAxis;
-	QwtAxisId yAxis = d_fixedAxis.isYAxis() ? d_fixedAxis : d_mobileAxis;
+	int xAxis = fixedAxisIsX() ? d_fixedAxis : d_mobileAxis;
+	int yAxis = fixedAxisIsY() ? d_fixedAxis : d_mobileAxis;
 	const QwtScaleMap xMap = plot()->canvasMap(xAxis);
 	const QwtScaleMap yMap = plot()->canvasMap(yAxis);
 
@@ -220,7 +230,7 @@ void Symbol::updateSurfacePos()
 	QwtInterval interval = plot()->axisInterval(d_mobileAxis);
 
 	if (d_within_plot) {
-		if (d_mobileAxis.pos == QwtPlot::yLeft) {
+		if (d_mobileAxis == QwtPlot::yLeft) {
 			if (plotCoord.y() < interval.minValue())
 				plotCoord.setY(interval.minValue());
 			else if (plotCoord.y() > interval.maxValue())
@@ -257,7 +267,7 @@ void Symbol::onFixedScaleChanged()
 	else
 		f = interval.minValue();
 
-	if (fixedAxis().isXAxis())
+	if (fixedAxisIsX())
 		pos.setX(f);
 	else
 		pos.setY(f);

@@ -23,13 +23,12 @@
 #include<qwt_plot_picker.h>
 #include<QPoint>
 #include<QPointF>
-#include<qwt_axis_id.h>
 #include<QWidget>
 
 class PlotPickerWrapper : public QwtPlotPicker
 {
 public:
-	PlotPickerWrapper(QwtAxisId xAxis, QwtAxisId yAxis, QWidget *);
+	PlotPickerWrapper(int xAxis, int yAxis, QWidget *);
 
 	QPointF pointCoordinates(const QPoint& pos) const;
 private:

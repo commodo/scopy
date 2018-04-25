@@ -22,7 +22,7 @@
 #include <qdebug.h>
 
 
-OscAdjuster::OscAdjuster(QWidget *parent, QwtAxisId axisId) :
+OscAdjuster::OscAdjuster(QWidget *parent, int axisId) :
 	QObject(parent),
 	d_isEnabled(false),
 	d_mousePressed(false),
@@ -47,7 +47,7 @@ const QWidget* OscAdjuster::parentWidget() const
 	return qobject_cast<const QWidget *>(parent());
 }
 
-QwtAxisId OscAdjuster::axisId()
+int OscAdjuster::axisId()
 {
 	return d_axisId;
 }
