@@ -237,7 +237,7 @@ void dBgraph::setShowZero(bool en)
     replot();
 }
 
-const QwtScaleWidget *dBgraph::getAxisWidget(QwtAxisId id)
+const QwtScaleWidget *dBgraph::getAxisWidget(int id)
 {
 	return axisWidget(id);
 }
@@ -321,7 +321,7 @@ void dBgraph::setXMin(double val)
 	zoomer->resetZoom();
 	setAxisScale(QwtPlot::xTop, val, xmax);
 	xmin = val;
-	draw_x->invalidateCache();
+	//draw_x->invalidateCache();
 
 	zoomer->setZoomBase();
 	replot();
@@ -332,7 +332,7 @@ void dBgraph::setXMax(double val)
 	zoomer->resetZoom();
 	setAxisScale(QwtPlot::xTop, xmin, val);
 	xmax = val;
-	draw_x->invalidateCache();
+	//draw_x->invalidateCache();
 
 	zoomer->setZoomBase();
 	replot();

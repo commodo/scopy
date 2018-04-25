@@ -571,7 +571,7 @@ TimeDomainDisplayPlot::addZoomer(unsigned int zoomerIdx)
 	d_zoomer[zoomerIdx]->setTrackerPen(c);
 
 	d_zoomer[zoomerIdx]->setEnabled(true);
-	d_zoomer[zoomerIdx]->setAxes(QwtAxisId(QwtPlot::xBottom, 0), QwtAxisId(QwtPlot::yLeft, zoomerIdx));
+	//d_zoomer[zoomerIdx]->setAxes(QwtPlot::xBottom, QwtPlot::yLeft);
 }
 
 void
@@ -595,8 +595,8 @@ TimeDomainDisplayPlot::removeZoomer(unsigned int zoomerIdx)
 	}
 
 	for (int i = 0; i < d_zoomer.size(); ++i) {
-		if (d_zoomer[i]->isEnabled())
-			d_zoomer[i]->setAxes(QwtAxisId(QwtPlot::xBottom, 0), QwtAxisId(QwtPlot::yLeft, i));
+	//	if (d_zoomer[i]->isEnabled())
+	//		d_zoomer[i]->setAxes(QwtPlot::xBottom, QwtPlot::yLeft);
 	}
 }
 
@@ -776,7 +776,7 @@ bool TimeDomainDisplayPlot::isZoomerEnabled()
 
 void TimeDomainDisplayPlot::setZoomerVertAxis(int index)
 {
-	if (index < -1 || index >= axesCount(QwtPlot::yLeft))
+	if (index < -1 || index >= vertAxes.size())
 		return;
 
 	for (unsigned int i = 0; i < d_zoomer.size(); ++i)
@@ -1137,7 +1137,6 @@ bool TimeDomainDisplayPlot::unregisterSink(std::string sinkName)
 
 void TimeDomainDisplayPlot::configureAxis(int axisPos, int axisIdx)
 {
-	QwtAxisId axis(axisPos, axisIdx);
 	PrefixFormatter *prefixFormatter;
 	QString unit;
 	unsigned int floatPrecision;
@@ -1158,12 +1157,12 @@ void TimeDomainDisplayPlot::configureAxis(int axisPos, int axisIdx)
 	// Use a custom Scale Engine to keep the grid fixed
 	OscScaleEngine *scaleEngine = new OscScaleEngine();
 	scaleEngine->setMajorTicksCount(numDivs + 1);
-	this->setAxisScaleEngine(axis, (QwtScaleEngine *)scaleEngine);
+	this->setAxisScaleEngine(axisPos, (QwtScaleEngine *)scaleEngine);
 
 	// Use a custom Scale Draw to control the drawing of axis values
 	OscScaleDraw *scaleDraw = new OscScaleDraw(prefixFormatter, unit);
 	scaleDraw->setFloatPrecision(floatPrecision);
-	this->setAxisScaleDraw(axis, scaleDraw);
+	this->setAxisScaleDraw(axisPos, scaleDraw);
 	if (axisPos == QwtPlot::yLeft) {
 		//yLeft 0 has a different position than the rest, so we
 		//give it a bigger minimum extent in order to align it with

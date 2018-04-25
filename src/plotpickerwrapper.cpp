@@ -19,7 +19,7 @@
 
 #include "plotpickerwrapper.h"
 
-PlotPickerWrapper::PlotPickerWrapper(QwtAxisId xAxis, QwtAxisId yAxis,
+PlotPickerWrapper::PlotPickerWrapper(int xAxis, int yAxis,
                                      QWidget *canvas):
 	QwtPlotPicker(xAxis,yAxis,canvas)
 {

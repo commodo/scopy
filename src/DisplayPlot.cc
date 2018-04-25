@@ -74,7 +74,7 @@ void OscScaleDraw::setUnitType(const QString& unit)
 		m_unit = unit;
 
 		// Trigger a new redraw of scale labels since there's a new unit that needs to be redrawn
-		invalidateCache();
+		//invalidateCache();
 	}
 }
 
@@ -299,13 +299,13 @@ void OscPlotZoomer::rescale()
 	    const bool doReplot = plt->autoReplot();
 	    plt->setAutoReplot( false );
 
-	    if (yAxis().id == 0) {
+	    if (yAxis() == 0) {
 		plt->setHorizUnitsPerDiv(width / plt->xAxisNumDiv());
 		plt->setHorizOffset(x1 + (width / 2));
 	    }
 
-	    plt->setVertUnitsPerDiv(height / plt->yAxisNumDiv(), yAxis().id);
-	    plt->setVertOffset(y1 + (height / 2), yAxis().id);
+	    plt->setVertUnitsPerDiv(height / plt->yAxisNumDiv(), yAxis());
+	    plt->setVertOffset(y1 + (height / 2), yAxis());
 
 	    plt->setAutoReplot( doReplot );
 
@@ -319,7 +319,7 @@ void OscPlotZoomer::rescale()
  * PlotAxisConfiguration
  */
 PlotAxisConfiguration::PlotAxisConfiguration(int axisPos, int axisIdx, DisplayPlot *plot):
-	d_axis(QwtAxisId(axisPos, axisIdx)), d_plot(plot), d_hoverCursorShape(Qt::ArrowCursor)
+	d_axis_id(axisIdx), d_axis_pos(axisPos), d_plot(plot), d_hoverCursorShape(Qt::ArrowCursor)
 {
 	Qt::CursorShape shape;
 
@@ -342,23 +342,23 @@ PlotAxisConfiguration::PlotAxisConfiguration(int axisPos, int axisIdx, DisplayPl
 	// Avoid jumping when labels with more/less digits
 	// appear/disappear when scrolling vertically
 	if (axisPos == QwtPlot::yLeft) {
-		const QFontMetrics fm(d_plot->axisWidget(d_axis)->font());
-		QwtScaleDraw *scaleDraw = d_plot->axisScaleDraw(d_axis);
+		const QFontMetrics fm(d_plot->axisWidget(d_axis_id)->font());
+		QwtScaleDraw *scaleDraw = d_plot->axisScaleDraw(d_axis_id);
 		scaleDraw->setMinimumExtent( fm.width("100.00") );
 	}
 
 	// TO DO: Move this to a stylesheet file.
-	QwtScaleWidget *scaleWidget = d_plot->axisWidget(d_axis);
+	QwtScaleWidget *scaleWidget = d_plot->axisWidget(d_axis_id);
 	scaleWidget->setStyleSheet("background-color: none;");
 
 	// This helps creating a fixed 5 X 5 grid
-	d_plot->setAxisScale(d_axis, -5.0, 5.0, 1);
+	d_plot->setAxisScale(d_axis_id, -5.0, 5.0, 1);
 
 	d_ptsPerDiv = 1.0;
 	d_offset = 0.0;
 
 	if (axisPos == QwtPlot::yLeft) {
-		d_mouseGestures = new VertMouseGestures(d_plot->axisWidget(d_axis), d_axis);
+		d_mouseGestures = new VertMouseGestures(d_plot->axisWidget(d_axis_id), d_axis_pos);
 		d_mouseGestures->setEnabled(false);
 
 		QObject::connect(this->d_mouseGestures, SIGNAL(wheelDown(int)),
@@ -371,7 +371,7 @@ PlotAxisConfiguration::PlotAxisConfiguration(int axisPos, int axisIdx, DisplayPl
 		QObject::connect(this->d_mouseGestures, SIGNAL(downMovement(double)),
 			d_plot, SLOT(onVertAxisOffsetIncrease()));
 	} else if (axisPos == QwtPlot::xBottom) {
-		d_mouseGestures = new HorizMouseGestures(d_plot->axisWidget(d_axis), d_axis);
+		d_mouseGestures = new HorizMouseGestures(d_plot->axisWidget(d_axis_id), d_axis_pos);
 		d_mouseGestures->setEnabled(false);
 
 		QObject::connect(this->d_mouseGestures, SIGNAL(wheelDown(int)),
@@ -390,9 +390,19 @@ PlotAxisConfiguration::~PlotAxisConfiguration()
 {
 }
 
-QwtAxisId& PlotAxisConfiguration::axis()
+int PlotAxisConfiguration::axisId()
 {
-	return d_axis;
+	return d_axis_id;
+}
+
+int PlotAxisConfiguration::axisPos()
+{
+	return d_axis_pos;
+}
+
+void PlotAxisConfiguration::setAxisId(int axisIdx)
+{
+	d_axis_id = axisIdx;
 }
 
 void PlotAxisConfiguration::setPtsPerDiv(double value)
@@ -418,14 +428,14 @@ double PlotAxisConfiguration::offset()
 void PlotAxisConfiguration::setCursorShapeOnHover(Qt::CursorShape shape)
 {
 	d_hoverCursorShape = shape;
-	QwtScaleWidget *scaleWidget = d_plot->axisWidget(d_axis);
+	QwtScaleWidget *scaleWidget = d_plot->axisWidget(d_axis_id);
 	scaleWidget->setCursor(shape);
 }
 
 void PlotAxisConfiguration::setMouseGesturesEnabled(bool en)
 {
 	d_mouseGestures->setEnabled(en);
-	QwtScaleWidget *scaleWidget = d_plot->axisWidget(d_axis);
+	QwtScaleWidget *scaleWidget = d_plot->axisWidget(d_axis_id);
 	if (en) {
 		scaleWidget->setCursor(d_hoverCursorShape);
 	} else {
@@ -979,10 +989,8 @@ void DisplayPlot::AddAxisOffset(int axisPos, int axisIdx, double offset)
 		break;
 	}
 
-	QwtAxisId axisId(axisPos, axisIdx);
-
-	setAxisScale(axisId, min + offset, max + offset,
-			axisStepSize(axisId));
+	setAxisScale(axisIdx, min + offset, max + offset,
+			axisStepSize(axisIdx));
 }
 
 void DisplayPlot::setVertOffset(double offset, int axisIdx)
@@ -1019,7 +1027,7 @@ void DisplayPlot::setVertUnitsPerDiv(double upd, int axisIdx)
 		vertAxes[axisIdx]->setPtsPerDiv(upd);
 		min = (d_yAxisMin * upd) + offset;
 		max = (d_yAxisMax * upd) + offset;
-		setAxisScale(QwtAxisId(QwtPlot::yLeft, axisIdx), min, max, upd);
+		setAxisScale(axisIdx, min, max, upd);
 		Q_EMIT vertScaleDivisionChanged(upd);
 	}
 }
@@ -1058,15 +1066,15 @@ void DisplayPlot::setDisplayScale(double value)
 {
 	d_displayScale = value;
 	OscScaleDraw *osd = nullptr;
-	osd = static_cast<OscScaleDraw*>(axisWidget(QwtAxisId(QwtPlot::yLeft, d_activeVertAxis))->scaleDraw());
+	osd = static_cast<OscScaleDraw*>(axisWidget(d_activeVertAxis)->scaleDraw());
 	osd->setDisplayScale(d_displayScale);
-	osd->invalidateCache();
-	axisWidget(QwtAxisId(QwtPlot::yLeft, d_activeVertAxis))->update();
+	//osd->invalidateCache();
+	axisWidget(d_activeVertAxis)->update();
 }
 
 void DisplayPlot::setActiveVertAxis(unsigned int axisIdx, bool selected)
 {
-	int numAxes = this->axesCount(QwtPlot::yLeft);
+	int numAxes = vertAxes.size();
 
 	if (axisIdx >= numAxes)
 		return;
@@ -1075,15 +1083,14 @@ void DisplayPlot::setActiveVertAxis(unsigned int axisIdx, bool selected)
 
 	if (d_usingLeftAxisScales && selected) {
 		for (int i = 0; i < numAxes; i++) {
-			this->setAxisVisible(QwtAxisId(QwtPlot::yLeft, i),
-					(i == axisIdx));
+			this->enableAxis(i, (i == axisIdx));
 		}
 	}
 
 	if (d_coloredLabels && selected) {
-		OscScaleDraw *scaleDraw = static_cast<OscScaleDraw *>(this->axisScaleDraw(QwtAxisId(QwtPlot::yLeft, axisIdx)));
+		OscScaleDraw *scaleDraw = static_cast<OscScaleDraw *>(this->axisScaleDraw(axisIdx));
 		scaleDraw->setColor(getLineColor(axisIdx));
-		scaleDraw->invalidateCache();
+		//scaleDraw->invalidateCache();
 	}
 }
 
@@ -1207,15 +1214,15 @@ void DisplayPlot::onVertAxisOffsetDecrease()
 	if (!osc_adj)
 		return;
 
-	double offset = this->VertOffset(osc_adj->axisId().id);
-	double scale = this->VertUnitsPerDiv(osc_adj->axisId().id);
+	double offset = this->VertOffset(osc_adj->axisId());
+	double scale = this->VertUnitsPerDiv(osc_adj->axisId());
 
 	offset -= scale / yAxisNumDiv();
 	// a value very close to 0.0 is explicitely set to 0.0
 	if ( qwtFuzzyCompare( offset, 0.0, scale / yAxisNumDiv() ) == 0 )
 		offset = 0;
 
-	this->setVertOffset(offset, osc_adj->axisId().id);
+	this->setVertOffset(offset, osc_adj->axisId());
 	this->replot();
 	Q_EMIT vertScaleOffsetChanged(offset);
 }
@@ -1227,8 +1234,8 @@ void DisplayPlot::onVertAxisOffsetIncrease()
 	if (!osc_adj)
 		return;
 
-	double offset = this->VertOffset(osc_adj->axisId().id);
-	double scale = this->VertUnitsPerDiv(osc_adj->axisId().id);
+	double offset = this->VertOffset(osc_adj->axisId());
+	double scale = this->VertUnitsPerDiv(osc_adj->axisId());
 
 	offset += scale / yAxisNumDiv();
 
@@ -1236,7 +1243,7 @@ void DisplayPlot::onVertAxisOffsetIncrease()
 	if ( qwtFuzzyCompare( offset, 0.0, scale / yAxisNumDiv() ) == 0 )
 		offset = 0;
 
-	this->setVertOffset(offset, osc_adj->axisId().id);
+	this->setVertOffset(offset, osc_adj->axisId());
 	this->replot();
 
 	Q_EMIT vertScaleOffsetChanged(offset);
@@ -1248,7 +1255,7 @@ void DisplayPlot::_onXbottomAxisWidgetScaleDivChanged()
 	OscScaleDraw *scale_draw = dynamic_cast<OscScaleDraw *>(axis_widget->scaleDraw());
 
 	if (scale_draw) {
-		scale_draw->invalidateCache();
+		//scale_draw->invalidateCache();
 		axis_widget->update();
 	}
 }
@@ -1259,7 +1266,7 @@ void DisplayPlot::_onYleftAxisWidgetScaleDivChanged()
 	OscScaleDraw *scale_draw = dynamic_cast<OscScaleDraw *>(axis_widget->scaleDraw());
 
 	if (scale_draw) {
-		scale_draw->invalidateCache();
+		//scale_draw->invalidateCache();
 		axis_widget->update();
 	}
 }
@@ -1301,11 +1308,11 @@ void DisplayPlot::vertAxisScaleIncrease()
 	if (!osc_adj)
 		return;
 
-	double div = VertUnitsPerDiv(osc_adj->axisId().id);
+	double div = VertUnitsPerDiv(osc_adj->axisId());
 	double newDiv = d_vScaleDivisions.getNumberAfter(div);
 
 	if (newDiv != div) {
-		setVertUnitsPerDiv(newDiv, osc_adj->axisId().id);
+		setVertUnitsPerDiv(newDiv, osc_adj->axisId());
 		replot();
 	}
 }
@@ -1317,11 +1324,11 @@ void DisplayPlot::vertAxisScaleDecrease()
 	if (!osc_adj)
 		return;
 
-	double div = VertUnitsPerDiv(osc_adj->axisId().id);
+	double div = VertUnitsPerDiv(osc_adj->axisId());
 	double newDiv = d_vScaleDivisions.getNumberBefore(div);
 
 	if (newDiv != div) {
-		setVertUnitsPerDiv(newDiv, osc_adj->axisId().id);
+		setVertUnitsPerDiv(newDiv, osc_adj->axisId());
 		replot();
 	}
 }
@@ -1333,19 +1340,17 @@ void DisplayPlot::removeLeftVertAxis(unsigned int axis)
 	if (axis >= numAxis)
 		return;
 
-	setAxesCount(QwtPlot::yLeft, numAxis - 1);
-
 	for (unsigned int i = axis + 1; i < numAxis; i++)
-		vertAxes[i]->axis().id = i - 1;
+		vertAxes[i]->setAxisId(i - 1);
 
 	delete vertAxes[axis];
 	vertAxes.erase(vertAxes.begin() + axis, vertAxes.begin() + axis + 1);
 
-	for (unsigned int i = axis; i < numAxis - 1; i++) {
+	for (unsigned int i = 0; i < numAxis; i++) {
 		double ptsPerDiv = vertAxes[i]->ptsPerDiv();
 		double offset = vertAxes[i]->offset();
 
-		setAxisScale(QwtAxisId(QwtPlot::yLeft, i),
+		setAxisScale(i,
 				(d_yAxisMin * ptsPerDiv) + offset,
 				(d_yAxisMax * ptsPerDiv) + offset,
 				ptsPerDiv);
@@ -1354,8 +1359,6 @@ void DisplayPlot::removeLeftVertAxis(unsigned int axis)
 
 void DisplayPlot::setLeftVertAxesCount(int count)
 {
-	setAxesCount(QwtPlot::yLeft, count);
-
 	const int numAxis = vertAxes.size();
 
 	for (int i = count; i < numAxis; i++) {
@@ -1366,9 +1369,9 @@ void DisplayPlot::setLeftVertAxesCount(int count)
 	for (int i = numAxis; i < count; i++) {
 		vertAxes[i] = new PlotAxisConfiguration(QwtPlot::yLeft, i, this);
 		configureAxis(QwtPlot::yLeft, i);
-		this->setAxisVisible(QwtAxisId(QwtPlot::yLeft, i),
+		this->enableAxis(i,
 			d_usingLeftAxisScales);
-		connect(axisWidget(vertAxes[i]->axis()), SIGNAL(scaleDivChanged()),
+		connect(axisWidget(vertAxes[i]->axisId()), SIGNAL(scaleDivChanged()),
 			      this, SLOT(_onYleftAxisWidgetScaleDivChanged()));
 	}
 }
@@ -1390,15 +1393,13 @@ bool DisplayPlot::usingLeftAxisScales()
 
 void DisplayPlot::configureAxis(int axisPos, int axisIdx)
 {
-	QwtAxisId axis(axisPos, axisIdx);
-
 	// Use a custom Scale Engine to keep the grid fixed
 	OscScaleEngine *scaleEngine = new OscScaleEngine();
-	this->setAxisScaleEngine(axis, (QwtScaleEngine *)scaleEngine);
+	this->setAxisScaleEngine(axisIdx, (QwtScaleEngine *)scaleEngine);
 
 	// Use a custom Scale Draw to control the drawing of axis values
 	OscScaleDraw *scaleDraw = new OscScaleDraw();
-	this->setAxisScaleDraw(axis, scaleDraw);
+	this->setAxisScaleDraw(axisIdx, scaleDraw);
 }
 
 void DisplayPlot::bottomHorizAxisInit()
@@ -1406,7 +1407,7 @@ void DisplayPlot::bottomHorizAxisInit()
 	horizAxis = new PlotAxisConfiguration(QwtPlot::xBottom, 0, this);
 	horizAxis->setMouseGesturesEnabled(d_mouseGesturesEnabled);
 	configureAxis(QwtPlot::xBottom, 0);
-	connect(axisWidget(horizAxis->axis()), SIGNAL(scaleDivChanged()),
+	connect(axisWidget(horizAxis->axisId()), SIGNAL(scaleDivChanged()),
 		      this, SLOT(_onXbottomAxisWidgetScaleDivChanged()));
 }
 

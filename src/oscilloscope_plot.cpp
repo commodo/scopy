@@ -192,7 +192,7 @@ CapturePlot::CapturePlot(QWidget *parent,
 		[=]() {
 			double pos = d_timeTriggerHandle->position();
 
-			QwtScaleMap xMap = this->canvasMap(QwtAxisId(QwtPlot::xBottom, 0));
+			QwtScaleMap xMap = this->canvasMap(QwtPlot::xBottom);
 			double min = -(xAxisNumDiv() / 2.0) * HorizUnitsPerDiv();
 			double max = (xAxisNumDiv() / 2.0) * HorizUnitsPerDiv();
 
@@ -682,8 +682,8 @@ void CapturePlot::setSelectedChannel(int id)
 		d_selected_channel = id;
 
 		if (id > -1) {
-			d_hBar1->setMobileAxis(QwtAxisId(QwtPlot::yLeft, id));
-			d_hBar2->setMobileAxis(QwtAxisId(QwtPlot::yLeft, id));
+			d_hBar1->setMobileAxis(QwtPlot::yLeft);
+			d_hBar2->setMobileAxis(QwtPlot::yLeft);
 		}
 	}
 	//
@@ -706,7 +706,7 @@ bool CapturePlot::measurementsEnabled()
 
 void CapturePlot::onTimeTriggerHandlePosChanged(int pos)
 {
-	QwtScaleMap xMap = this->canvasMap(QwtAxisId(QwtPlot::xBottom, 0));
+	QwtScaleMap xMap = this->canvasMap(QwtPlot::xBottom);
 	double min = -(xAxisNumDiv() / 2.0) * HorizUnitsPerDiv();
 	double max = (xAxisNumDiv() / 2.0) * HorizUnitsPerDiv();
 
@@ -790,13 +790,15 @@ void CapturePlot::enableLabels(bool enabled)
 void CapturePlot::enableAxisLabels(bool enabled)
 {
 	enableAxis(QwtPlot::xBottom, enabled);
+// FIXME
+#if 0
 	if (!enabled) {
 		int nrAxes = axesCount(QwtPlot::yLeft);
 		for (int i = 0; i < nrAxes; ++i) {
-			setAxisVisible(QwtAxisId(QwtPlot::yLeft, i),
-					enabled);
+			setAxisVisible(i, enabled);
 		}
 	}
+#endif
 }
 
 void CapturePlot::setDisplayScale(double value)
@@ -879,13 +881,14 @@ void CapturePlot::showYAxisWidget(unsigned int axisIdx, bool en)
 	if (!d_labelsEnabled)
 		return;
 
-	setAxisVisible(QwtAxisId(QwtPlot::yLeft, axisIdx),
-						en);
+// FIXME
+#if 0
+	setAxisVisible(axisIdx, en);
 
 	int nrAxes = axesCount(QwtPlot::yLeft);
 	bool allAxisDisabled = true;
 	for (int i = 0; i < nrAxes; ++i)
-		if (isAxisVisible(QwtAxisId(QwtPlot::yLeft, i)))
+		if (isAxisVisible(i))
 			allAxisDisabled = false;
 
 	if (allAxisDisabled) {
@@ -895,12 +898,13 @@ void CapturePlot::showYAxisWidget(unsigned int axisIdx, bool en)
 	if (en) {
 		setAxisVisible(QwtPlot::xBottom, true);
 	}
+#endif
 }
 
 void CapturePlot::updateHandleAreaPadding(bool enabled)
 {
 	if (enabled) {
-		d_bottomHandlesArea->setLeftPadding(50 + axisWidget(QwtAxisId(QwtPlot::yLeft, d_activeVertAxis))->width());
+		d_bottomHandlesArea->setLeftPadding(50 + axisWidget(QwtPlot::yLeft)->width());
 		QwtScaleWidget *scaleWidget = axisWidget(QwtPlot::xBottom);
 		const int fmw = QFontMetrics(scaleWidget->font()).width("-XX.XX XX");
 		const int fmh = QFontMetrics(scaleWidget->font()).height();
@@ -1037,7 +1041,7 @@ void CapturePlot::onChannelAdded(int chnIdx)
 	d_symbolCtrl->attachSymbol(chOffsetBar);
 	chOffsetBar->setCanLeavePlot(true);
 	chOffsetBar->setVisible(false);
-	chOffsetBar->setMobileAxis(QwtAxisId(QwtPlot::yLeft, chnIdx));
+	chOffsetBar->setMobileAxis(QwtPlot::yLeft);
 	d_offsetBars.push_back(chOffsetBar);
 
 	RoundedHandleV *chOffsetHdl = new RoundedHandleV(
@@ -1056,7 +1060,7 @@ void CapturePlot::onChannelAdded(int chnIdx)
 			if (chn_id < 0)
 				return;
 
-			QwtScaleMap yMap = this->canvasMap(QwtAxisId(QwtPlot::yLeft, chn_id));
+			QwtScaleMap yMap = this->canvasMap(QwtPlot::yLeft);
 			double min = -(yAxisNumDiv() / 2.0) * VertUnitsPerDiv(chn_id);
 			double max = (yAxisNumDiv() / 2.0) * VertUnitsPerDiv(chn_id);
 
@@ -1138,7 +1142,7 @@ void CapturePlot::removeOffsetWidgets(int chnIdx)
 		return;
 
 	HorizBar *bar = d_offsetBars.takeAt(chnIdx);
-	bar->setMobileAxis(QwtAxisId(QwtPlot::yLeft, 0));
+	bar->setMobileAxis(QwtPlot::yLeft);
 	d_symbolCtrl->detachSymbol(bar);
 	delete bar;
 	delete(d_offsetHandles.takeAt(chnIdx));
@@ -1335,9 +1339,11 @@ void CapturePlot::removeLeftVertAxis(unsigned int axis)
 
 	// Update the mobile axis ID of all symbols
 	for (int i = axis; i < numAxis - 1; i++) {
-		QwtAxisId axisId = d_offsetBars.at(i)->mobileAxis();
-		--axisId.id;
+#if 0
+		int axisId = d_offsetBars.at(i)->mobileAxisId();
+		--axisId;
 		d_offsetBars.at(i)->setMobileAxis(axisId);
+#endif
 	}
 
 	DisplayPlot::removeLeftVertAxis(axis);
