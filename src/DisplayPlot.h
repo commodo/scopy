@@ -625,7 +625,10 @@ public:
 	PlotAxisConfiguration(int axisPos, int axisIdx, DisplayPlot *plot);
 	~PlotAxisConfiguration();
 
-	QwtAxisId& axis();
+	int axisId();
+	int axisPos();
+
+	void setAxisId(int axisId);
 
 	void setPtsPerDiv(double value);
 	double ptsPerDiv();
@@ -638,7 +641,8 @@ public:
 	void setMouseGesturesEnabled(bool en);
 
 private:
-	QwtAxisId d_axis;
+	int d_axis_id;
+	int d_axis_pos;
 	DisplayPlot *d_plot;
 
 	Qt::CursorShape d_hoverCursorShape;

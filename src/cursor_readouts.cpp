@@ -277,7 +277,7 @@ QString CursorReadouts::deltaVoltageLabelText(){
     return ui->deltaVlabel->text();
 }
 
-void CursorReadouts::setAxis(QwtAxisId hAxis,QwtAxisId vAxis){
+void CursorReadouts::setAxis(int hAxis,int vAxis){
     this->hAxis = hAxis;
     this->vAxis = vAxis;
 }

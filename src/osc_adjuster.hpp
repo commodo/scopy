@@ -33,13 +33,13 @@ class OscAdjuster: public QObject
 {
 	Q_OBJECT
 public:
-	explicit OscAdjuster(QWidget*, QwtAxisId axisId);
+	explicit OscAdjuster(QWidget*, int axisId);
 	virtual ~OscAdjuster();
 
 	QWidget *parentWidget();
 	const QWidget *parentWidget() const;
 
-	QwtAxisId axisId();
+	int axisId();
 
 	void setMouseFactor(double);
 	double mouseFactor() const;
@@ -70,14 +70,14 @@ protected:
 	bool d_isEnabled;
 	QPoint d_mousePos;
 	Qt::MouseButton d_mouseButton;
-	QwtAxisId d_axisId;
+	int d_axisId;
 };
 
 class VertMouseGestures: public OscAdjuster
 {
 	Q_OBJECT
 public:
-	explicit VertMouseGestures(QWidget *parent, QwtAxisId axisId):
+	explicit VertMouseGestures(QWidget *parent, int axisId):
 		OscAdjuster(parent, axisId)
 	{
 	}
@@ -126,7 +126,7 @@ class HorizMouseGestures: public OscAdjuster
 {
 	Q_OBJECT
 public:
-	explicit HorizMouseGestures(QWidget *parent, QwtAxisId axisId):
+	explicit HorizMouseGestures(QWidget *parent, int axisId):
 		OscAdjuster(parent, axisId)
 	{
 	}

@@ -306,16 +306,13 @@ Oscilloscope::Oscilloscope(struct iio_context *ctx, Filter *filt,
 	plot.setActiveVertAxis(0);
 
 	for (unsigned int i = 0; i < nb_channels; i++) {
-		plot.Curve(i)->setAxes(
-				QwtAxisId(QwtPlot::xBottom, 0),
-				QwtAxisId(QwtPlot::yLeft, i));
+		plot.Curve(i)->setAxes(QwtPlot::xBottom, QwtPlot::yLeft);
 		plot.addZoomer(i);
 		probe_attenuation.push_back(1);
 		plot.Curve(i)->setTitle("CH " + QString::number(i + 1));
 	}
 
-
-	plot.levelTriggerA()->setMobileAxis(QwtAxisId(QwtPlot::yLeft, 0));
+	plot.levelTriggerA()->setMobileAxis(QwtPlot::yLeft);
 	plot.setTriggerAEnabled(trigger_settings.analogEnabled());
 	plot.levelTriggerA()->setPosition(trigger_settings.level());
 
@@ -771,9 +768,7 @@ void Oscilloscope::add_ref_waveform(unsigned int chIdx)
 	ui->chn_scales->addWidget(label);
 	probe_attenuation.push_back(1);
 
-	plot.Curve(curve_id)->setAxes(
-	        QwtAxisId(QwtPlot::xBottom, 0),
-	        QwtAxisId(QwtPlot::yLeft, curve_id));
+	plot.Curve(curve_id)->setAxes(QwtPlot::xBottom, QwtPlot::yLeft);
 	plot.Curve(curve_id)->setTitle("REF " + QString::number(nb_ref_channels + 1));
 	plot.addZoomer(curve_id);
 	plot.replot();
@@ -1597,9 +1592,7 @@ void Oscilloscope::add_math_channel(const std::string& function)
 				"}").arg(plot.getLineColor(curve_id).name()));
 		ui->chn_scales->addWidget(label);
 
-	plot.Curve(curve_id)->setAxes(
-			QwtAxisId(QwtPlot::xBottom, 0),
-			QwtAxisId(QwtPlot::yLeft, curve_id));
+	plot.Curve(curve_id)->setAxes(QwtPlot::xBottom, QwtPlot::yLeft);
 	plot.Curve(curve_id)->setTitle("M " + QString::number(curve_number + 1));
 	plot.addZoomer(curve_id);
 	plot.replot();
@@ -1822,9 +1815,7 @@ void Oscilloscope::onChannelWidgetDeleteClicked()
 	for (unsigned int i = nb_channels;
 	     i < nb_channels + nb_math_channels + nb_ref_channels; i++) {
 		/* Update the curve-to-axis map */
-		plot.Curve(i)->setAxes(
-		        QwtAxisId(QwtPlot::xBottom, 0),
-		        QwtAxisId(QwtPlot::yLeft, i));
+		plot.Curve(i)->setAxes(QwtPlot::xBottom, QwtPlot::yLeft);
 	}
 
 	onMeasurementSelectionListChanged();
@@ -2227,7 +2218,7 @@ void adiscope::Oscilloscope::on_boxMeasure_toggled(bool on)
 
 void Oscilloscope::onTriggerSourceChanged(int chnIdx)
 {
-	plot.levelTriggerA()->setMobileAxis(QwtAxisId(QwtPlot::yLeft, chnIdx));
+	plot.levelTriggerA()->setMobileAxis(QwtPlot::yLeft);
 	trigger_settings.setChannelAttenuation(probe_attenuation[chnIdx]);
 	if (chnAcCoupled.at(chnIdx)) {
 		deactivateAcCouplingTrigger();
@@ -3899,8 +3890,7 @@ void Oscilloscope::updateGainMode()
 	}
 
 	QwtInterval hw_input_itv(-2.5, 2.5);
-	QwtInterval plot_vert_itv = plot.axisScaleDiv(
-		QwtAxisId(QwtPlot::yLeft, current_ch_widget)).interval();
+	QwtInterval plot_vert_itv = plot.axisScaleDiv(QwtPlot::yLeft).interval();
 
 	// If max signal span that can be captured is smaller than the plot
 	// screen try to increase the range (switch to low gain mode)

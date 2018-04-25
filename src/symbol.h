@@ -28,9 +28,8 @@ class Symbol: public QObject
 	Q_OBJECT
 
 public:
-	Symbol(QObject *parent, const QSize& size, QwtAxisId fixedAxis,
-		QwtAxisId mobileAxis, bool opposedToFixed = false,
-		bool floats = false);
+	Symbol(QObject *parent, const QSize& size, int fixedAxis,
+		int mobileAxis, bool opposedToFixed = false, bool floats = false);
 	virtual ~Symbol();
 
 	const QwtPlot *plot() const;
@@ -48,10 +47,10 @@ public:
 	void setSelected(bool selected);
 	bool isSelected();
 
-	QwtAxisId fixedAxis() const;
-	QwtAxisId mobileAxis() const;
+	int fixedAxis() const;
+	int mobileAxis() const;
 
-	void setMobileAxis(QwtAxisId);
+	void setMobileAxis(int axis);
 
 	void setStepSize(double);
 	double stepSize();
@@ -95,8 +94,8 @@ protected:
 	QPointF d_plotCoord; // Position of symbol in plot coordinates
 	bool d_selected;
 
-	QwtAxisId d_fixedAxis;  // The axis on which the symbol must not move
-	QwtAxisId d_mobileAxis; // The axis on which the symbol can be shifted
+	int d_fixedAxis;  // The axis on which the symbol must not move
+	int d_mobileAxis; // The axis on which the symbol can be shifted
 	double d_stepSize;   // Symbol position can take only values that are a multiple of d_stepSize. If d_stepSize = 0 symbol pos can take any value.
 	bool d_oppToFixed;   // If symbol should be placed diametrically opposed to the fixed axis
 	bool d_floats;       // If symbols floats on top of the plot or is attached to the plot
@@ -105,6 +104,9 @@ protected:
 	bool d_visible;
 
 	QPen d_pen;
+
+	bool fixedAxisIsX() const;
+	bool fixedAxisIsY() const;
 };
 
 class VertDebugSymbol: public Symbol
