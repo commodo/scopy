@@ -408,7 +408,7 @@ void NetworkAnalyzer::rightMenuFinished(bool opened)
 
 void NetworkAnalyzer::showEvent(QShowEvent *event)
 {
-        d_bottomHandlesArea->setLeftPadding(m_dBgraph.axisWidget(QwtAxisId(QwtPlot::yLeft, 0))->width()
+        d_bottomHandlesArea->setLeftPadding(m_dBgraph.axisWidget(QwtPlot::yLeft)->width()
                                 + ui->gridLayout_plots->margin()
                                 + ui->widgetPlotContainer->layout()->margin() + 1);
         int rightPadding = 0;

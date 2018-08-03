@@ -1001,8 +1001,8 @@ void CapturePlot::displayIntersection()
 		attachmk2 = false;
 	}
 
-	markerIntersection1->setAxes(QwtPlot::xBottom, QwtAxisId(QwtPlot::yLeft, d_selected_channel));
-	markerIntersection2->setAxes(QwtPlot::xBottom, QwtAxisId(QwtPlot::yLeft, d_selected_channel));
+	markerIntersection1->setAxes(QwtPlot::xBottom, QwtPlot::yLeft);
+	markerIntersection2->setAxes(QwtPlot::xBottom, QwtPlot::yLeft);
 
 	markerIntersection1->setValue(d_vBar1->plotCoord().x(), intersectionCursor1);
 	markerIntersection2->setValue(d_vBar2->plotCoord().x(), intersectionCursor2);
