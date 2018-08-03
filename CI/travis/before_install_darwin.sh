@@ -60,7 +60,7 @@ make_build_git "libsigrok" "https://github.com/sigrokproject/libsigrok" "" "" ".
 
 make_build_wget "libsigrokdecode-0.4.1" "http://sigrok.org/download/source/libsigrokdecode/libsigrokdecode-0.4.1.tar.gz"
 
-qmake_build_git "qwt" "https://github.com/osakared/qwt.git" "qwt-6.1-multiaxes" "qwt.pro" "patch_qwt"
+qmake_build_wget "qwt-6.1.3" "https://github.com/osakared/qwt.git" "" "qwt.pro"
 
 qmake_build_wget "qwtpolar-1.1.1" "https://downloads.sourceforge.net/project/qwtpolar/qwtpolar/1.1.1/qwtpolar-1.1.1.tar.bz2" "qwtpolar.pro" "patch_qwtpolar_mac"
 

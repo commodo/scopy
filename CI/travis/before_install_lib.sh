@@ -73,7 +73,7 @@ __build_common() {
 
 wget_and_untar() {
 	[ -d "$WORKDIR/$dir" ] || {
-		local tar_file="${dir}.tar.gz"
+		local tar_file="${dir}.tar.*"
 		wget --no-check-certificate "$url" -O "$tar_file"
 		tar -xvf "$tar_file" > /dev/null
 		[ -z "$patchfunc" ] || {
@@ -200,8 +200,6 @@ EOF
 }
 
 patch_qwtpolar() {
-	wget https://raw.githubusercontent.com/analogdevicesinc/scopy-flatpak/master/qwtpolar-qwt-6.1-compat.patch -O - | patch -p1
-
 	patch -p1 <<-EOF
 --- a/qwtpolarconfig.pri
 +++ b/qwtpolarconfig.pri

@@ -43,7 +43,7 @@ if ! is_new_ubuntu ; then
 	set -e
 else
 	sudo apt-get install -y qt5-default qttools5-dev qtdeclarative5-dev \
-		libqt5svg5-dev libqt5opengl5-dev
+		libqt5svg5-dev libqt5opengl5-dev libqwt-qt5-dev
 	QMAKE="$(command -v qmake)"
 fi
 
@@ -73,12 +73,12 @@ if ! is_new_ubuntu ; then
 	make_build_wget "libsigrokdecode-0.4.1" "http://sigrok.org/download/source/libsigrokdecode/libsigrokdecode-0.4.1.tar.gz"
 
 	cmake_build_wget "volk-1.3" "http://libvolk.org/releases/volk-1.3.tar.gz"
+
+	qmake_build_wget "qwt-6.1.3" "https://github.com/osakared/qwt.git" "" "qwt.pro"
 else
 	sudo apt-get install -y \
 		libvolk1-dev libsigrok-dev libsigrokcxx-dev libsigrokdecode-dev
 fi
-
-qmake_build_git "qwt" "https://github.com/osakared/qwt.git" "qwt-6.1-multiaxes" "qwt.pro" "patch_qwt"
 
 qmake_build_wget "qwtpolar-1.1.1" "https://downloads.sourceforge.net/project/qwtpolar/qwtpolar/1.1.1/qwtpolar-1.1.1.tar.bz2" "qwtpolar.pro" "patch_qwtpolar_linux"
 
