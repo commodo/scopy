@@ -13,8 +13,6 @@ if command -v brew ; then
 	export PATH="${QT_PATH}:$PATH"
 fi
 
-NUM_JOBS=4
-
 mkdir -p build
 
 pushd build

@@ -25,7 +25,7 @@ brew_install() {
 
 PYTHON="python3 python@2 python brew-pip"
 PACKAGES="qt cmake fftw bison gettext autoconf automake libtool libzip glib libusb $PYTHON"
-PACKAGES="$PACKAGES glibmm doxygen wget boost gnu-sed libmatio dylibbundler libxml2 pkg-config"
+PACKAGES="$PACKAGES glibmm doxygen wget boost gnu-sed libmatio dylibbundler libxml2 pkg-config gnuradio"
 
 for pak in $PACKAGES ; do
 	brew_install $pak
@@ -82,8 +82,6 @@ qmake_build_git "qwt" "https://github.com/osakared/qwt.git" "qwt-6.1-multiaxes" 
 qmake_build_wget "qwtpolar-1.1.1" "https://downloads.sourceforge.net/project/qwtpolar/qwtpolar/1.1.1/qwtpolar-1.1.1.tar.bz2" "qwtpolar.pro" "patch_qwtpolar_mac"
 
 cmake_build_wget "volk-1.3" "http://libvolk.org/releases/volk-1.3.tar.gz"
-
-cmake_build_git "gnuradio" "https://github.com/analogdevicesinc/gnuradio" "scopy" "-DENABLE_INTERNAL_VOLK:BOOL=OFF -DENABLE_GR_FEC:BOOL=OFF -DENABLE_GR_DIGITAL:BOOL=OFF -DENABLE_GR_DTV:BOOL=OFF -DENABLE_GR_ATSC:BOOL=OFF -DENABLE_GR_AUDIO:BOOL=OFF -DENABLE_GR_CHANNELS:BOOL=OFF -DENABLE_GR_NOAA:BOOL=OFF -DENABLE_GR_PAGER:BOOL=OFF -DENABLE_GR_TRELLIS:BOOL=OFF -DENABLE_GR_VOCODER:BOOL=OFF"
 
 if [ "$TRAVIS" == "true" ] ; then
 	for pkg in libiio libad9361-iio ; do
