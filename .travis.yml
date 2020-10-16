@@ -1,38 +1,20 @@
 language: cpp
 sudo: required
 
-cache:
-  ccache: true
-  directories:
-    - .ccache
-    - ${TRAVIS_BUILD_DIR}/deps
-
-python:
-  - "3.5"
-
-services:
-  - docker
-
 matrix:
-  fast_finish: true
   include:
-    - compiler: "gcc"
-      os: linux
-      dist: xenial
     - os: linux
-      env:
-        - OS_TYPE=ubuntu_docker
-        - OS_VERSION=bionic
+      dist: focal
     - os: linux
       env:
         - OS_TYPE=centos_docker
-        - OS_VERSION=centos7
-    - compiler: "clang"
+        - OS_VERSION=8
+        - EXTRA_SSH=-oHostKeyAlgorithms=+ssh-dss
+    - compiler: "gcc"
       os: osx
-      osx_image: xcode10.1
-    - compiler: "clang"
-      os: osx
-      osx_image: xcode9.2
+      osx_image: xcode11
+      env:
+        - EXTRA_SSH=-oHostKeyAlgorithms=+ssh-dss
 
 before_install:
   - if [[ "$TRAVIS_OS_NAME" == "osx" ]]; then ./CI/travis/before_install_darwin.sh ; fi
